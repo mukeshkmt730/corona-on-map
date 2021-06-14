@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #map{
+            width: 100%;
+            height: 100vh;
+            
+        }
+        </style>
+    <title>Corona map</title>
+</head>
+
+<body>
+    <div id='map'></div>
+</body>
+
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js'></script>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoibXVrZXNoa210IiwiYSI6ImNrcG14MWxsYzBtOGUyb3FxaHo5Y21sbWMifQ.eFL3-s755oUjeAQ8IHo2PQ';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        zoom:1.2,
+        center:[0,40]
+    });
+</script>
+
+<script >
+    function updateMap() {
+    console.log("updating map with real time data");
+    fetch("data.json")
+        .then(response => response.json())
+        .then(rsp => {
+            // console.log(rsp.data);
+            rsp.data.forEach(element => {
+                latitude = element.latitude;
+                longitude = element.longitude;
+
+                cases=element.infected;
+                if (cases>255) {
+                    color="rgb(255,0,0)";           
+                }
+                else{
+                    color=`rgb(255,${255-cases},${255-cases})`;
+                }
+
+                //mark on the map
+                new mapboxgl.Marker({
+                    draggable: false,
+                    color:color
+                })
+                    .setLngLat([longitude, latitude])
+                    .addTo(map);
+            });
+
+        })
+}
+
+setInterval(updateMap ,10000);
+</script>
+
+</html>
